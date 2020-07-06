@@ -12,6 +12,7 @@ disallow_incomplete_defs = True
 disallow_untyped_defs = True
 disallow_untyped_decorators = True
 warn_unused_ignores = True
+ignore_missing_imports = False
 """
 
 LAX_BASELINE_MYPY_CONFIG = """
@@ -48,6 +49,3 @@ def make_ignore_missing_imports_block(module_name: str) -> str:
 [mypy-{module_name}.*]
 ignore_missing_imports = True
 """
-
-
-

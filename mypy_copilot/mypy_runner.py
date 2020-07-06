@@ -3,13 +3,16 @@ import os
 from os import path
 import subprocess
 from tempfile import TemporaryDirectory
-from typing import List, Type, TypeVar
+from typing import List, Type, TypeVar, Optional
+
+from .verbosity import log_if_verbose
 
 
-def _run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
+def run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
     with TemporaryDirectory(prefix="mypy-copilot") as temp_dir:
         mypy_config_path = path.join(temp_dir, "mypy.ini")
         with open(mypy_config_path, "w") as mypy_config_file:
+            log_if_verbose(f"Writing temporary mypy config file:\n\n{mypy_config}\n")
             mypy_config_file.write(mypy_config)
             mypy_config_file.flush()
             os.fsync(mypy_config_file.fileno())
@@ -22,6 +25,7 @@ def _run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
             "--error-summary",
             ".",
         ]
+        log_if_verbose(f"Running mypy with {run_args}")
         completed_process = subprocess.run(run_args, capture_output=True, encoding="utf-8")
         return completed_process
 
@@ -37,10 +41,15 @@ class MypyError:
     message: str
 
     @classmethod
-    def from_mypy_output_line(cls: Type[MypyErrorT], line: str) -> MypyErrorT:
+    def from_mypy_output_line(cls: Type[MypyErrorT], line: str) -> Optional[MypyErrorT]:
         file_path, line_num, rest_of_line = line.split(":", 2)
         file_path = file_path.strip()
         line_number = int(line_num.strip())
+
+        rest_of_line = rest_of_line.strip()
+        if rest_of_line.startswith("note:"):
+            # This is not an error, ignore it.
+            return None
 
         message, error_code = rest_of_line.rsplit("[", 1)
         message = message.strip()
@@ -49,30 +58,35 @@ class MypyError:
         return cls(file_path, line_number, error_code, message)
 
 
-def get_mypy_errors_for_run_with_config(mypy_config: str) -> List[MypyError]:
-    completed_process = _run_mypy_with_config(mypy_config)
-
+def get_mypy_errors_from_completed_process(
+    completed_process: subprocess.CompletedProcess,
+) -> List[MypyError]:
     output_lines = completed_process.stdout.strip().split("\n")
     if completed_process.returncode == 0:
         if not output_lines[-1].startswith("Success: no issues found"):
-            raise AssertionError(
-                f"Unexpected output for mypy exit code 0: {output_lines}"
-            )
+            raise AssertionError(f"Unexpected output for mypy exit code 0: {output_lines}")
 
         return []
     elif completed_process.returncode == 1:
         if not (output_lines[-1].startswith("Found ") and " error" in output_lines[-1]):
-            raise AssertionError(
-                f"Unexpected output for mypy exit code 1: {output_lines}"
-            )
+            raise AssertionError(f"Unexpected output for mypy exit code 1: {output_lines}")
 
         error_lines = output_lines[:-1]
         return [
-            MypyError.from_mypy_output_line(error_line)
-            for error_line in error_lines
+            value
+            for value in (
+                MypyError.from_mypy_output_line(error_line)
+                for error_line in error_lines
+            )
+            if value is not None
         ]
     else:
         raise AssertionError(
             f"Unexpected mypy exit code {completed_process.returncode}. "
             f"Process info: {completed_process}"
         )
+
+
+def get_mypy_errors_for_run_with_config(mypy_config: str) -> List[MypyError]:
+    completed_process = run_mypy_with_config(mypy_config)
+    return get_mypy_errors_from_completed_process(completed_process)
