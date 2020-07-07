@@ -43,3 +43,26 @@ You can then also use the `mypy.ini` file to see which checks had to be disabled
 In the future, we hope to add additional functionality to `typing-copilot`:
 - a command that highlights opportunities where a small amount of work can allow a new rule to be enabled for a new module, allowing you to maximize your project's typing enforcement;
 - support for additional `mypy` rules.
+
+## Usage
+
+Navigate to the root directory (and virtualenv, if using one) of the project on which you'd like to use `typing-copilot`. Then,
+```
+pip install typing-copilot
+
+tc init
+```
+
+`typing-copilot` will first run `mypy` using a minimal set of `mypy` checks which are always enabled and cannot be turned off. You'll need to fix any errors `mypy` finds using these checks before moving to the next step.
+
+Once the minimal `mypy` checks pass, `tc init` will automatically re-run `mypy` with the strictest supported set of checks, and collect the reported errors. After analyzing the errors, it will generate the strictest set of checks that will not cause errors, validate them by running `mypy` against your project one more time, and then create a new `mypy.ini` file with this new configuration.
+
+## Reporting issues
+
+This is a project I built in my spare time, please be gentle :)
+
+GitHub issues are the preferred avenue for reporting issues with `typing-copilot`. Please do not email me or any other contributors with questions or issue reports, unless you have our explicit consent to do so.
+
+To ensure the best odds that we can diagnose and fix any problems together, please always make sure to include in your issue report the log produced using the `--verbose` option, together with links to the source code being analyzed by `mypy` and `typing-copilot`.
+
+As always, pull requests highly encouraged and gratefully accepted.

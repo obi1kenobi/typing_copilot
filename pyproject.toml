@@ -2,7 +2,7 @@
 name = "typing-copilot"
 version = "0.1.0"
 description = "Helper for starting to type-hint large codebases with mypy."
-authors = ["Predrag Gruevski"]
+authors = ["Predrag Gruevski <obi1kenobi82@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
