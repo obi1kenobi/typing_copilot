@@ -15,7 +15,7 @@ def read_file(filename: str) -> str:
     # see here:
     # https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
     here = os.path.abspath(os.path.dirname(__file__))
-    with codecs.open(os.path.join(here, "mypy_copilot", filename), "r") as f:
+    with codecs.open(os.path.join(here, "typing_copilot", filename), "r") as f:
         return f.read()
 
 

@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "mypy-copilot"
+name = "typing-copilot"
 version = "0.1.0"
 description = "Helper for starting to type-hint large codebases with mypy."
-authors = ["Your Name <you@example.com>"]
+authors = ["Predrag Gruevski"]
 license = "MIT"
 
 [tool.poetry.dependencies]

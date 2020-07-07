@@ -4,6 +4,8 @@ import os
 import re
 from typing import AbstractSet, Dict, FrozenSet, List, Optional, Set, Tuple
 
+import click
+
 from .mypy_runner import MypyError
 from .validation import validate_module_name
 
@@ -11,6 +13,9 @@ from .validation import validate_module_name
 _module_missing_type_hint_pattern = re.compile(
     r"error: Skipping analyzing '([a-zA-Z0-9_\.]+)': "
     r"found module but no type hints or library stubs"
+)
+_module_missing_implementation_or_library_stub_pattern = re.compile(
+    r"error: Cannot find implementation or library stub for module named '([a-zA-Z0-9_\.]+)'"
 )
 
 MypyErrorSetting = Tuple[str, bool]
@@ -84,7 +89,7 @@ def _get_error_setting_for_error(error: MypyError) -> MypyErrorSetting:
         raise AssertionError(
             f"Failed to deduce a matching error setting for an error with recognized "
             f"error code {error.error_code}: {error}. This is a bug, the error matching rules "
-            f"within mypy_copilot will need to be updated."
+            f"within typing_copilot will need to be updated."
         )
 
     return error_setting
@@ -204,10 +209,19 @@ def get_3rd_party_modules_missing_type_hints(
     for import_error in import_errors:
         module_name_match = _module_missing_type_hint_pattern.match(import_error.message)
         if module_name_match is None:
-            raise AssertionError(
-                f"Unrecognized mypy [import]-coded error: {import_error}"
-                f"This should never happen."
-            )
+            module_name_match = _module_missing_implementation_or_library_stub_pattern.match(
+                import_error.message)
+            if module_name_match is None:
+                raise AssertionError(
+                    f"Unrecognized mypy [import]-coded error: {import_error} "
+                    f"This should never happen."
+                )
+            else:
+                click.echo(
+                    f"WARNING: mypy was not able to find type hints for module "
+                    f"'{module_name_match.group(1)}' since it does not seem to be installed "
+                    f"in the current environment. Assuming it has no type hints available."
+                )
 
         module_name = module_name_match.group(1)
         module_names.add(module_name)
