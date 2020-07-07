@@ -46,9 +46,6 @@ def make_1st_party_module_rule_block(module_name: str, rules: List[MypyErrorSett
     validate_module_name(module_name)
 
     section_header = f"\n[mypy-{module_name}.*]\n"
-    rule_lines = [
-        f"{rule_name} = {value}"
-        for (rule_name, value) in rules
-    ]
+    rule_lines = [f"{rule_name} = {value}" for (rule_name, value) in rules]
 
     return section_header + "\n".join(rule_lines) + "\n"

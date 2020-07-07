@@ -59,9 +59,7 @@ def init(verbose: bool, overwrite: bool) -> None:
     completed_process = run_mypy_with_config(LAX_BASELINE_MYPY_CONFIG)
     errors = get_mypy_errors_from_completed_process(completed_process)
     if errors:
-        click.echo(
-            "Mypy found errors during our baseline run. Executed mypy with config:\n"
-        )
+        click.echo("Mypy found errors during our baseline run. Executed mypy with config:\n")
         click.echo(LAX_BASELINE_MYPY_CONFIG)
         click.echo("Mypy output:\n")
         click.echo(completed_process.stdout)
@@ -71,9 +69,7 @@ def init(verbose: bool, overwrite: bool) -> None:
         )
         sys.exit(0)
 
-    click.echo(
-        "Collecting mypy errors from strictest check configuration. Please wait...\n"
-    )
+    click.echo("Collecting mypy errors from strictest check configuration. Please wait...\n")
     strict_errors = get_mypy_errors_for_run_with_config(STRICT_BASELINE_MYPY_CONFIG)
     if not strict_errors:
         with open("mypy.ini", "w") as f:
@@ -102,9 +98,7 @@ def init(verbose: bool, overwrite: bool) -> None:
         click.echo(
             "    More info: https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports"
         )
-        click.echo(
-            f"    Affected modules: {sorted(list(imported_modules_missing_type_hints))}\n"
-        )
+        click.echo(f"    Affected modules: {sorted(list(imported_modules_missing_type_hints))}\n")
 
         final_config_third_party_modules = "# Third-party module rule relaxations" + "".join(
             make_ignore_missing_imports_block(module_name)
@@ -140,8 +134,7 @@ def init(verbose: bool, overwrite: bool) -> None:
         with open("mypy.ini", "w") as f:
             f.write(final_config)
         click.echo(
-            "Validation complete. Your mypy.ini file has been updated. "
-            "Happy type-safe coding!"
+            "Validation complete. Your mypy.ini file has been updated. " "Happy type-safe coding!"
         )
         sys.exit(0)
     else:

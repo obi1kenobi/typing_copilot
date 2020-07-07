@@ -34,16 +34,14 @@ _code_and_message_to_error_setting: Dict[str, Dict[str, MypyErrorSetting]] = {
     "no-untyped-def": {
         # Given in order of most-selective to least-selective. Note that these substrings overlap!
         "error: Function is missing a type annotation for one or more arguments": (
-            "disallow_incomplete_defs", False),
+            "disallow_incomplete_defs",
+            False,
+        ),
         "error: Function is missing a type annotation": ("disallow_untyped_defs", False),
         "": ("disallow_incomplete_defs", False),
     },
-    "no-untyped-call": {
-        "": ("disallow_untyped_calls", False),
-    },
-    "": {
-        "error: unused 'type: ignore' comment": ("warn_unused_ignores", False),
-    },
+    "no-untyped-call": {"": ("disallow_untyped_calls", False),},
+    "": {"error: unused 'type: ignore' comment": ("warn_unused_ignores", False),},
 }
 _settings_that_require_other_settings: Dict[MypyErrorSetting, FrozenSet[MypyErrorSetting]] = {
     ("disallow_incomplete_defs", False): frozenset({("disallow_untyped_defs", False)})
@@ -111,7 +109,7 @@ def _get_module_for_error(error: MypyError) -> str:
     known_python_extensions = {".py", ".pyo", ".pyx", ".pyc"}
     for python_extension in known_python_extensions:
         if error_in_file.endswith(python_extension):
-            error_in_file = error_in_file[:-len(python_extension)]
+            error_in_file = error_in_file[: -len(python_extension)]
 
     if "." in error_in_file:
         raise AssertionError(
@@ -124,7 +122,7 @@ def _get_module_for_error(error: MypyError) -> str:
     suffixes_to_strip = {"__init__"}
     for suffix_to_strip in suffixes_to_strip:
         if error_in_file.endswith(suffix_to_strip):
-            error_in_file = error_in_file[:-len(suffix_to_strip)]
+            error_in_file = error_in_file[: -len(suffix_to_strip)]
 
     module_name = error_in_file.strip(os.sep).replace(os.sep, ".")
     validate_module_name(module_name)
@@ -196,21 +194,17 @@ def _consider_replacing_child_modules_with_parent(module_names: AbstractSet[str]
 # # Public API #
 # ##############
 
-def get_3rd_party_modules_missing_type_hints(
-    errors: List[MypyError]
-) -> FrozenSet[str]:
-    import_errors = [
-        error
-        for error in errors
-        if error.error_code == "import"
-    ]
+
+def get_3rd_party_modules_missing_type_hints(errors: List[MypyError]) -> FrozenSet[str]:
+    import_errors = [error for error in errors if error.error_code == "import"]
 
     module_names: Set[str] = set()
     for import_error in import_errors:
         module_name_match = _module_missing_type_hint_pattern.match(import_error.message)
         if module_name_match is None:
             module_name_match = _module_missing_implementation_or_library_stub_pattern.match(
-                import_error.message)
+                import_error.message
+            )
             if module_name_match is None:
                 raise AssertionError(
                     f"Unrecognized mypy [import]-coded error: {import_error} "
@@ -230,13 +224,9 @@ def get_3rd_party_modules_missing_type_hints(
 
 
 def get_1st_party_modules_and_suppressions(
-    errors: List[MypyError]
+    errors: List[MypyError],
 ) -> Dict[str, List[MypyErrorSetting]]:
-    non_import_errors = [
-        error
-        for error in errors
-        if error.error_code != "import"
-    ]
+    non_import_errors = [error for error in errors if error.error_code != "import"]
 
     needed_setting_to_modules: Dict[MypyErrorSetting, Set[str]] = {}
     for error in non_import_errors:

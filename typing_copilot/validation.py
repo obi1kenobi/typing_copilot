@@ -18,4 +18,3 @@ def validate_module_name(module_name: str) -> None:
         raise AssertionError(
             f"Invalid module name: cannot start or end with a period character, got '{module_name}'"
         )
-

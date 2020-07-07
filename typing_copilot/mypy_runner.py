@@ -29,7 +29,8 @@ def run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
         completed_process = subprocess.run(run_args, capture_output=True, encoding="utf-8")
         log_if_verbose(
             f"Run completed with exit code {completed_process.returncode}. "
-            f"Stdout: ***\n{completed_process.stdout}\n***")
+            f"Stdout: ***\n{completed_process.stdout}\n***"
+        )
         return completed_process
 
 
@@ -83,10 +84,7 @@ def get_mypy_errors_from_completed_process(
         error_lines = output_lines[:-1]
         return [
             value
-            for value in (
-                MypyError.from_mypy_output_line(error_line)
-                for error_line in error_lines
-            )
+            for value in (MypyError.from_mypy_output_line(error_line) for error_line in error_lines)
             if value is not None
         ]
     else:
