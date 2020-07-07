@@ -11,15 +11,19 @@ Running mypy once with laxest settings to establish a baseline. Please wait...
 
 Collecting mypy errors from strictest check configuration. Please wait...
 
-Strict run completed and uncovered 2955 mypy errors. Building the strictest mypy config such that all configured mypy checks still pass...
+Strict run completed and uncovered 2955 mypy errors. Building the strictest mypy config
+such that all configured mypy checks still pass...
 
-> Mypy was unable to find type hints for some 3rd party modules, configuring mypy to ignore them.
+> Mypy was unable to find type hints for some 3rd party modules, configuring mypy to
+ignore them.
     More info: https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
-    Affected modules: ['arrow', 'cached_property', 'funcy', 'neo4j', 'parameterized', 'pyorient', 'pytest', 'redisgraph', 'setuptools', 'snapshottest', 'sqlalchemy']
+    Affected modules: ['arrow', 'cached_property', 'funcy', 'neo4j', 'parameterized',
+        'pyorient', 'pytest', 'redisgraph', 'setuptools', 'snapshottest', 'sqlalchemy']
 
 > Constructed 126 mypy error suppression rules across 65 modules.
 
-Config generated (306 lines). Validating the new setup before updating your mypy.ini file. Please wait...
+Config generated (306 lines). Validating the new setup before updating your mypy.ini
+file. Please wait...
 
 Validation complete. Your mypy.ini file has been updated. Happy type-safe coding!
 ```
