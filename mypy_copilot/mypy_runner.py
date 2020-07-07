@@ -9,7 +9,7 @@ from .verbosity import log_if_verbose
 
 
 def run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
-    with TemporaryDirectory(prefix="mypy-copilot") as temp_dir:
+    with TemporaryDirectory(prefix="mypy-copilot-") as temp_dir:
         mypy_config_path = path.join(temp_dir, "mypy.ini")
         with open(mypy_config_path, "w") as mypy_config_file:
             log_if_verbose(f"Writing temporary mypy config file:\n\n{mypy_config}\n")
@@ -27,6 +27,9 @@ def run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
         ]
         log_if_verbose(f"Running mypy with {run_args}")
         completed_process = subprocess.run(run_args, capture_output=True, encoding="utf-8")
+        log_if_verbose(
+            f"Run completed with exit code {completed_process.returncode}. "
+            f"Stdout: ***\n{completed_process.stdout}\n***")
         return completed_process
 
 
@@ -51,9 +54,15 @@ class MypyError:
             # This is not an error, ignore it.
             return None
 
-        message, error_code = rest_of_line.rsplit("[", 1)
-        message = message.strip()
-        error_code = error_code.strip().strip("]").rstrip()
+        if "[" not in rest_of_line:
+            # It seems the errors emitted by the "warn_unused_ignores" check
+            # do not have error codes. Use the empty string for their error code.
+            message = rest_of_line
+            error_code = ""
+        else:
+            message, error_code = rest_of_line.rsplit("[", 1)
+            message = message.strip()
+            error_code = error_code.strip().strip("]").rstrip()
 
         return cls(file_path, line_number, error_code, message)
 
