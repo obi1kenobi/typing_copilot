@@ -25,7 +25,7 @@ from . import __version__
 
 
 @click.group()
-@click.option("--verbose", is_flag=True)
+@click.option("--verbose", is_flag=True, help="Enable verbose logging.")
 def cli(verbose: bool) -> None:
     if verbose:
         enable_verbose_mode()
@@ -33,8 +33,10 @@ def cli(verbose: bool) -> None:
 
 
 @cli.command()
-@click.option("--verbose", is_flag=True, default=False)
-@click.option("--overwrite", is_flag=True, default=False)
+@click.option("--verbose", is_flag=True, default=False, help="Enable verbose logging.")
+@click.option(
+    "--overwrite", is_flag=True, default=False, help="Overwrite existing mypy.ini, if any"
+)
 def init(verbose: bool, overwrite: bool) -> None:
     click.echo(f"typing_copilot v{__version__}\n")
     if verbose:
@@ -54,7 +56,7 @@ def init(verbose: bool, overwrite: bool) -> None:
             )
             sys.exit(1)
 
-    click.echo("Running mypy once with lax settings to establish a baseline. Please wait...\n")
+    click.echo("Running mypy once with laxest settings to establish a baseline. Please wait...\n")
 
     completed_process = run_mypy_with_config(LAX_BASELINE_MYPY_CONFIG)
     errors = get_mypy_errors_from_completed_process(completed_process)

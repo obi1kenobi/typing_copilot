@@ -51,6 +51,7 @@ setup(
     author="Predrag Gruevski",
     license="MIT",
     packages=find_packages(),
+    entry_points={"console_scripts": ["tc=typing_copilot.cli:cli"],},
     install_requires=[  # Make sure to keep in sync with poetry requirements.
         "click>=7,<8",
         "mypy>=0.782,<1",
