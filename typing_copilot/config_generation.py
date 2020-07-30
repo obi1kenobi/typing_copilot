@@ -16,8 +16,10 @@ disallow_untyped_calls = True
 disallow_incomplete_defs = True
 disallow_untyped_defs = True
 disallow_untyped_decorators = True
-warn_unused_ignores = False  # mypy-copilot: disabled as mypy only reports it if other checks pass
 ignore_missing_imports = False
+
+# mypy-copilot: disabled as mypy only reports it if other checks pass
+warn_unused_ignores = False
 """
 
 LAX_BASELINE_MYPY_CONFIG = f"""
