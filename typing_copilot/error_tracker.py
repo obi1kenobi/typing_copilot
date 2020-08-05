@@ -1,6 +1,7 @@
 import importlib
 import inspect
 import os
+import pkgutil
 import re
 from typing import AbstractSet, Dict, FrozenSet, List, Optional, Set, Tuple
 
@@ -132,10 +133,11 @@ def _get_module_for_error(error: MypyError) -> str:
 def _get_child_module_names_for_module(module_name: str) -> Set[str]:
     module = importlib.import_module(module_name)
 
-    return {
-        f"{module_name}.{submodule_name}"
-        for submodule_name, _ in inspect.getmembers(module, inspect.ismodule)
-    }
+    result: Set[str] = set()
+    for module_info in pkgutil.walk_packages(module.__path__, module_name + "."):
+        result.add(module_info.name)
+
+    return result
 
 
 def _consider_replacing_child_modules_with_parent(module_names: AbstractSet[str]) -> FrozenSet[str]:
@@ -243,6 +245,24 @@ def get_1st_party_modules_and_suppressions(
                     needed_setting_to_modules[depended_setting].update(
                         needed_setting_to_modules[dependent_setting]
                     )
+
+    from pprint import pprint
+    error_setting = ("disallow_untyped_defs", False)
+    print("module names:")
+    module_names = needed_setting_to_modules[error_setting]
+    pprint(module_names)
+
+    print("\n\nminimum cover")
+    minimum_cover = _find_minimum_covering_modules(module_names)
+    pprint(minimum_cover)
+
+    print("\n\nchild modules of graphql_compiler.cost_estimation")
+    pprint(_get_child_module_names_for_module("graphql_compiler.cost_estimation"))
+
+    print("\n\nfinal config")
+    final_config = _consider_replacing_child_modules_with_parent(minimum_cover)
+    pprint(final_config)
+    print("\n")
 
     # Discard any modules for which the setting would be implied through an ancestor module.
     needed_setting_to_minimum_covering_modules: Dict[MypyErrorSetting, FrozenSet[str]] = {
