@@ -18,7 +18,8 @@ disallow_untyped_defs = True
 disallow_untyped_decorators = True
 ignore_missing_imports = False
 
-# mypy-copilot: disabled as mypy only reports it if other checks pass
+# typing-copilot: setting this option to True is not yet supported by typing-copilot,
+#                 as mypy only reports these errors if other checks pass
 warn_unused_ignores = False
 """
 
