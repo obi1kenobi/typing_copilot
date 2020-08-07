@@ -246,24 +246,6 @@ def get_1st_party_modules_and_suppressions(
                         needed_setting_to_modules[dependent_setting]
                     )
 
-    from pprint import pprint
-    error_setting = ("disallow_untyped_defs", False)
-    print("module names:")
-    module_names = needed_setting_to_modules[error_setting]
-    pprint(module_names)
-
-    print("\n\nminimum cover")
-    minimum_cover = _find_minimum_covering_modules(module_names)
-    pprint(minimum_cover)
-
-    print("\n\nchild modules of graphql_compiler.cost_estimation")
-    pprint(_get_child_module_names_for_module("graphql_compiler.cost_estimation"))
-
-    print("\n\nfinal config")
-    final_config = _consider_replacing_child_modules_with_parent(minimum_cover)
-    pprint(final_config)
-    print("\n")
-
     # Discard any modules for which the setting would be implied through an ancestor module.
     needed_setting_to_minimum_covering_modules: Dict[MypyErrorSetting, FrozenSet[str]] = {
         error_setting: _consider_replacing_child_modules_with_parent(
