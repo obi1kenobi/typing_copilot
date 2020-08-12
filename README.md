@@ -5,7 +5,7 @@ Helper for starting to type-hint large codebases with `mypy`. When installed, av
 Example output generated when generating a `mypy.ini` file for the [GraphQL compiler](https://github.com/kensho-technologies/graphql-compiler) project ([PR link](https://github.com/kensho-technologies/graphql-compiler/pull/876)):
 ```
 $ tc init
-typing_copilot v0.1.0
+typing_copilot v0.2.0
 
 Running mypy once with laxest settings to establish a baseline. Please wait...
 
@@ -53,9 +53,14 @@ pip install typing-copilot
 tc init
 ```
 
+If you are already using `mypy` for your project and already have a `mypy.ini` file that you would like to overwrite, simply add the `--overwrite` option:
+```
+tc init --overwrite
+```
+
 `typing-copilot` will first run `mypy` using a minimal set of `mypy` checks which are always enabled and cannot be turned off. You'll need to fix any errors `mypy` finds using these checks before moving to the next step.
 
-Once the minimal `mypy` checks pass, `tc init` will automatically re-run `mypy` with the strictest supported set of checks, and collect the reported errors. After analyzing the errors, it will generate the strictest set of checks that will not cause errors, validate them by running `mypy` against your project one more time, and then create a new `mypy.ini` file with this new configuration.
+Once the minimal `mypy` checks pass, `tc init` will automatically re-run `mypy` with the strictest supported set of checks, and collect the reported errors. After analyzing the errors, it will generate the strictest set of checks that will not cause errors, validate them by running `mypy` against your project one more time, and then create a new `mypy.ini` file with this new "strictest valid" configuration.
 
 ## Reporting issues
 
@@ -63,6 +68,6 @@ This is a project I built in my spare time, please be gentle :)
 
 GitHub issues are the preferred avenue for reporting issues with `typing-copilot`. Please do not email me or any other contributors with questions or issue reports, unless you have our explicit consent to do so.
 
-To ensure the best odds that we can diagnose and fix any problems together, please always make sure to include in your issue report the log produced using the `--verbose` option, together with links to the source code being analyzed by `mypy` and `typing-copilot`.
+To ensure the best odds that we can diagnose and fix any problems together, please make sure to include in your issue report the log produced using the `--verbose` option, together with links to the source code being analyzed by `mypy` and `typing-copilot`.
 
 As always, pull requests highly encouraged and gratefully accepted.
