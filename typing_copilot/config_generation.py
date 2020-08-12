@@ -17,10 +17,6 @@ disallow_incomplete_defs = True
 disallow_untyped_defs = True
 disallow_untyped_decorators = True
 ignore_missing_imports = False
-
-# typing-copilot: setting this option to True is not yet supported by typing-copilot,
-#                 as mypy only reports these errors if other checks pass
-warn_unused_ignores = False
 """
 
 LAX_BASELINE_MYPY_CONFIG = f"""
@@ -34,9 +30,13 @@ disallow_untyped_calls = False
 disallow_incomplete_defs = False
 disallow_untyped_defs = False
 disallow_untyped_decorators = False
-warn_unused_ignores = False
 ignore_missing_imports = True
 """
+
+
+def make_unused_ignores_config_line(unused_ignores_setting: bool) -> str:
+    # N.B.: As of version 0.782, mypy only reports these errors if other checks pass.
+    return f"warn_unused_ignores = {unused_ignores_setting}\n"
 
 
 def make_ignore_missing_imports_block(module_name: str) -> str:

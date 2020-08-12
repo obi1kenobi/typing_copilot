@@ -37,7 +37,7 @@ def run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
 MypyErrorT = TypeVar("MypyErrorT", bound="MypyError")
 
 
-@dataclass
+@dataclass(frozen=True, order=True)
 class MypyError:
     file_path: str
     line_number: int

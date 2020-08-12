@@ -21,6 +21,7 @@ _module_missing_implementation_or_library_stub_pattern = re.compile(
 
 MypyErrorSetting = Tuple[str, bool]
 
+_warn_unused_ignores_error_setting: MypyErrorSetting = ("warn_unused_ignores", False)
 
 # For each error code, store the message substrings that indicate the flag that is the cause of the
 # given error and the flag value that will hide the error, in order of decreasing selectivity.
@@ -42,7 +43,7 @@ _code_and_message_to_error_setting: Dict[str, Dict[str, MypyErrorSetting]] = {
         "": ("disallow_incomplete_defs", False),
     },
     "no-untyped-call": {"": ("disallow_untyped_calls", False),},
-    "": {"error: unused 'type: ignore' comment": ("warn_unused_ignores", False),},
+    "": {"error: unused 'type: ignore' comment": _warn_unused_ignores_error_setting,},
 }
 _settings_that_require_other_settings: Dict[MypyErrorSetting, FrozenSet[MypyErrorSetting]] = {
     ("disallow_incomplete_defs", False): frozenset({("disallow_untyped_defs", False)})
@@ -263,3 +264,14 @@ def get_1st_party_modules_and_suppressions(
         error_settings.sort()
 
     return module_to_error_settings
+
+
+def find_unused_ignores(errors: List[MypyError]) -> List[MypyError]:
+    """Return the set of unused "type: ignore" suppressions that mypy has found."""
+    result: List[MypyError] = []
+    for error in errors:
+        error_setting = _get_error_setting_for_error(error)
+        if error_setting == _warn_unused_ignores_error_setting:
+            result.append(error)
+
+    return result

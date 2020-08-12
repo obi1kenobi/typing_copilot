@@ -10,8 +10,10 @@ from .config_generation import (
     STRICT_BASELINE_MYPY_CONFIG,
     make_1st_party_module_rule_block,
     make_ignore_missing_imports_block,
+    make_unused_ignores_config_line,
 )
 from .error_tracker import (
+    find_unused_ignores,
     get_1st_party_modules_and_suppressions,
     get_3rd_party_modules_missing_type_hints,
 )
@@ -58,7 +60,9 @@ def init(verbose: bool, overwrite: bool) -> None:
 
     click.echo("Running mypy once with laxest settings to establish a baseline. Please wait...\n")
 
-    completed_process = run_mypy_with_config(LAX_BASELINE_MYPY_CONFIG)
+    completed_process = run_mypy_with_config(
+        LAX_BASELINE_MYPY_CONFIG + make_unused_ignores_config_line(False)
+    )
     errors = get_mypy_errors_from_completed_process(completed_process)
     if errors:
         click.echo("Mypy found errors during our baseline run. Executed mypy with config:\n")
@@ -72,7 +76,9 @@ def init(verbose: bool, overwrite: bool) -> None:
         sys.exit(0)
 
     click.echo("Collecting mypy errors from strictest check configuration. Please wait...\n")
-    strict_errors = get_mypy_errors_for_run_with_config(STRICT_BASELINE_MYPY_CONFIG)
+    strict_errors = get_mypy_errors_for_run_with_config(
+        STRICT_BASELINE_MYPY_CONFIG + make_unused_ignores_config_line(False)
+    )
     if not strict_errors:
         with open("mypy.ini", "w") as f:
             f.write(STRICT_BASELINE_MYPY_CONFIG)
@@ -88,6 +94,7 @@ def init(verbose: bool, overwrite: bool) -> None:
     )
 
     final_config_global = STRICT_BASELINE_MYPY_CONFIG
+    final_config_unused_ignores = make_unused_ignores_config_line(True)
     final_config_first_party_modules = ""
     final_config_third_party_modules = ""
 
@@ -122,30 +129,54 @@ def init(verbose: bool, overwrite: bool) -> None:
         )
 
     final_config = "\n\n".join(
-        [final_config_global, final_config_first_party_modules, final_config_third_party_modules]
+        [
+            final_config_global + final_config_unused_ignores,
+            final_config_first_party_modules,
+            final_config_third_party_modules,
+        ]
     )
     config_file_length = len(final_config.split("\n"))
     click.echo(
-        f"Config generated ({config_file_length} lines). Validating the new "
-        f"setup before updating your mypy.ini file. Please wait...\n"
+        f"Config generated ({config_file_length} lines). Verifying the last few mypy settings "
+        f"and validating the new configuration does not produce mypy errors. Please wait...\n"
     )
 
     completed_process = run_mypy_with_config(final_config)
     validation_run_errors = get_mypy_errors_from_completed_process(completed_process)
-    if not validation_run_errors:
-        with open("mypy.ini", "w") as f:
-            f.write(final_config)
-        click.echo(
-            "Validation complete. Your mypy.ini file has been updated. " "Happy type-safe coding!"
-        )
-        sys.exit(0)
-    else:
+    unused_ignore_errors = find_unused_ignores(validation_run_errors)
+    other_errors = set(validation_run_errors) - set(unused_ignore_errors)
+
+    if other_errors:
+        click.echo("Validation failed due to unexpected error(s):")
+        click.echo(pprint.pformat(list(other_errors)))
+
         raise AssertionError(
-            f"Validation failed: mypy reported {len(validation_run_errors)} more errors. "
-            f"Please re-run this command with the '--verbose' flag and then submit "
-            f"the produced logs so we can update mypy-copilot to fix this issue."
-            f"Apologies for the inconvenience, and thank you for supporting mypy-copilot."
+            f"Validation failed: mypy reported {len(other_errors)} unexpected error(s). "
+            f"Please submit the produced logs so we can update typing-copilot to fix this issue."
+            f"Apologies for the inconvenience, and thank you for supporting typing-copilot."
         )
+
+    if unused_ignore_errors:
+        # This cannot be done during the normal "strict" check because "unused ignore" errors
+        # are (at least as recently as mypy version 0.782) only reported if other checks pass.
+        # This is why we check it during the validation stage.
+        click.echo(
+            f"> Mypy reported {len(unused_ignore_errors)} situation(s) where a 'type: ignore' is "
+            f"specified but unnecessary. Configuring mypy to globally ignore such unnecessary "
+            f"type check suppressions; please strongly consider resolving this issue ASAP.\n"
+        )
+        final_config = "\n\n".join(
+            [
+                final_config_global + make_unused_ignores_config_line(False),
+                final_config_first_party_modules,
+                final_config_third_party_modules,
+            ]
+        )
+
+    with open("mypy.ini", "w") as f:
+        f.write(final_config)
+    click.echo("Validation complete. Your mypy.ini file has been updated. Happy type-safe coding!")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
