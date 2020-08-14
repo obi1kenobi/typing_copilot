@@ -59,5 +59,5 @@ setup(
         "mypy>=0.782,<1",
     ],
     extras_require={':python_version<"3.7"': ["dataclasses>=0.7"]},
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )
