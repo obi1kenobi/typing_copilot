@@ -1,11 +1,11 @@
-# typing-copilot
+# typing_copilot
 
-Helper for starting to type-hint large codebases with `mypy`. When installed, available as the command `tc`.
+Helper for starting to type-hint large codebases with `mypy`. When installed, available as the command `typing_copilot`.
 
 Example output generated when generating a `mypy.ini` file for the [GraphQL compiler](https://github.com/kensho-technologies/graphql-compiler) project ([PR link](https://github.com/kensho-technologies/graphql-compiler/pull/876)):
 ```
-$ tc init
-typing_copilot v0.2.0
+$ typing_copilot init
+typing_copilot v0.3.0
 
 Running mypy once with laxest settings to establish a baseline. Please wait...
 
@@ -36,38 +36,38 @@ Starting to use `mypy` in a large codebase can feel like a chicken-and-egg probl
 
 `mypy` allows specifying different levels of rule enforcement on a per-module basis. However, writing a good per-module `mypy` configuration is an extremely time-consuming process: `mypy` must be executed (in a strict configuration) against that module, the resulting errors must be triaged, and an appropriate set of rules for the modules must be produced. Applying this process on a large codebase can easily take hours or days of work.
 
-`typing-copilot` aims to make this process extremely quick and simple. After installing this package in your project's development environment, running `tc init` will autogenerate a `mypy.ini` file with the strictest set of `mypy` rules that your code currently passes. In future runs, `mypy` will automatically use the new `mypy.ini` file, thereby ensuring that no future code edits violate any typing rules that the current codebase satisfies.
+`typing_copilot` aims to make this process extremely quick and simple. After installing this package in your project's development environment, running `typing_copilot init` will autogenerate a `mypy.ini` file with the strictest set of `mypy` rules that your code currently passes. In future runs, `mypy` will automatically use the new `mypy.ini` file, thereby ensuring that no future code edits violate any typing rules that the current codebase satisfies.
 
-You can then also use the `mypy.ini` file to see which checks had to be disabled for which of your project's modules, and use that information to guide your future typing efforts. You can also periodically re-run `tc init --overwrite` to regenerate a `mypy.ini` file, in case your project's typing state has improved and stricter rules may now be adopted.
+You can then also use the `mypy.ini` file to see which checks had to be disabled for which of your project's modules, and use that information to guide your future typing efforts. You can also periodically re-run `typing_copilot init --overwrite` to regenerate a `mypy.ini` file, in case your project's typing state has improved and stricter rules may now be adopted.
 
-In the future, we hope to add additional functionality to `typing-copilot`:
+In the future, we hope to add additional functionality to `typing_copilot`:
 - a command that highlights opportunities where a small amount of work can allow a new rule to be enabled for a new module, allowing you to maximize your project's typing enforcement;
 - support for additional `mypy` rules.
 
 ## Usage
 
-Navigate to the root directory (and virtualenv, if using one) of the project on which you'd like to use `typing-copilot`. Then,
+Navigate to the root directory (and virtualenv, if using one) of the project on which you'd like to use `typing_copilot`. Then,
 ```
-pip install typing-copilot
+pip install typing_copilot
 
-tc init
+typing_copilot init
 ```
 
 If you are already using `mypy` for your project and already have a `mypy.ini` file that you would like to overwrite, simply add the `--overwrite` option:
 ```
-tc init --overwrite
+typing_copilot init --overwrite
 ```
 
-`typing-copilot` will first run `mypy` using a minimal set of `mypy` checks which are always enabled and cannot be turned off. You'll need to fix any errors `mypy` finds using these checks before moving to the next step.
+`typing_copilot` will first run `mypy` using a minimal set of `mypy` checks which are always enabled and cannot be turned off. You'll need to fix any errors `mypy` finds using these checks before moving to the next step.
 
-Once the minimal `mypy` checks pass, `tc init` will automatically re-run `mypy` with the strictest supported set of checks, and collect the reported errors. After analyzing the errors, it will generate the strictest set of checks that will not cause errors, validate them by running `mypy` against your project one more time, and then create a new `mypy.ini` file with this new "strictest valid" configuration.
+Once the minimal `mypy` checks pass, `typing_copilot init` will automatically re-run `mypy` with the strictest supported set of checks, and collect the reported errors. After analyzing the errors, it will generate the strictest set of checks that will not cause errors, validate them by running `mypy` against your project one more time, and then create a new `mypy.ini` file with this new "strictest valid" configuration.
 
 ## Reporting issues
 
 This is a project I built in my spare time, please be gentle :)
 
-GitHub issues are the preferred avenue for reporting issues with `typing-copilot`. Please do not email me or any other contributors with questions or issue reports, unless you have our explicit consent to do so.
+GitHub issues are the preferred avenue for reporting issues with `typing_copilot`. Please do not email me or any other contributors with questions or issue reports, unless you have our explicit consent to do so.
 
-To ensure the best odds that we can diagnose and fix any problems together, please make sure to include in your issue report the log produced using the `--verbose` option, together with links to the source code being analyzed by `mypy` and `typing-copilot`.
+To ensure the best odds that we can diagnose and fix any problems together, please make sure to include in your issue report the log produced using the `--verbose` option, together with links to the source code being analyzed by `mypy` and `typing_copilot`.
 
 As always, pull requests highly encouraged and gratefully accepted.

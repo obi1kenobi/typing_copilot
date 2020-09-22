@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "typing-copilot"
-version = "0.1.0"
+name = "typing_copilot"
+version = "0.3.0"
 description = "Helper for starting to type-hint large codebases with mypy."
 authors = ["Predrag Gruevski <obi1kenobi82@gmail.com>"]
 license = "MIT"
@@ -12,7 +12,7 @@ python = "^3.8"
 [tool.poetry.dev-dependencies]
 jupyterlab = "^2.1.5"
 mypy = "^0.782"
-black = "==19.10b0"
+black = "==20.8b1"
 flake8 = "^3.6.0"
 click = "^7.1.2"
 
