@@ -3,7 +3,12 @@
 Helper for starting to type-hint large codebases with `mypy`. When installed, available as the command `typing_copilot`.
 
 Example output generated when generating a `mypy.ini` file for the [GraphQL compiler](https://github.com/kensho-technologies/graphql-compiler) project ([PR link](https://github.com/kensho-technologies/graphql-compiler/pull/876)):
-```
+```bash
+# First, enter the project's virtual environment.
+# Make sure the project's dependencies are installed in the environment!
+$ poetry shell  # or "pipenv shell" or "source venv/bin/activate" or ...
+<...>
+
 $ typing_copilot init
 typing_copilot v0.3.0
 
@@ -46,15 +51,17 @@ In the future, we hope to add additional functionality to `typing_copilot`:
 
 ## Usage
 
-Navigate to the root directory (and virtualenv, if using one) of the project on which you'd like to use `typing_copilot`. Then,
-```
+1. Navigate to the root directory of the project on which you'd like to use `typing_copilot`.
+2. Enter the project's virtualenv, if using one, and ensure the project's dependencies are installed.
+3. Run `typing_copilot`:
+```bash
 pip install typing_copilot
 
 typing_copilot init
 ```
 
 If you are already using `mypy` for your project and already have a `mypy.ini` file that you would like to overwrite, simply add the `--overwrite` option:
-```
+```bash
 typing_copilot init --overwrite
 ```
 
