@@ -10,7 +10,7 @@ $ poetry shell  # or "pipenv shell" or "source venv/bin/activate" or ...
 <...>
 
 $ typing_copilot init
-typing_copilot v0.3.0
+typing_copilot v0.4.0
 
 Running mypy once with laxest settings to establish a baseline. Please wait...
 
@@ -43,7 +43,9 @@ Starting to use `mypy` in a large codebase can feel like a chicken-and-egg probl
 
 `typing_copilot` aims to make this process extremely quick and simple. After installing this package in your project's development environment, running `typing_copilot init` will autogenerate a `mypy.ini` file with the strictest set of `mypy` rules that your code currently passes. In future runs, `mypy` will automatically use the new `mypy.ini` file, thereby ensuring that no future code edits violate any typing rules that the current codebase satisfies.
 
-You can then also use the `mypy.ini` file to see which checks had to be disabled for which of your project's modules, and use that information to guide your future typing efforts. You can also periodically re-run `typing_copilot init --overwrite` to regenerate a `mypy.ini` file, in case your project's typing state has improved and stricter rules may now be adopted.
+You can then also use the `mypy.ini` file to see which checks had to be disabled for which of your project's modules, and use that information to guide your future typing efforts. You can also periodically re-run `typing_copilot tighten` to regenerate a `mypy.ini` file, in case your project's typing state has improved and stricter rules may now be adopted.
+
+Ideally, consider using `typing_copilot` in a "ratcheting" fashion, where your project is always on the tightest possible `mypy.ini` configuration. The easiest way to do so is to run `typing_copilot tighten --error-if-can-tighten` in your CI environment, which will `exit 1` in case your current `mypy.ini` is not the tightest possible one for your project.
 
 In the future, we hope to add additional functionality to `typing_copilot`:
 - a command that highlights opportunities where a small amount of work can allow a new rule to be enabled for a new module, allowing you to maximize your project's typing enforcement;
@@ -60,14 +62,32 @@ pip install typing_copilot
 typing_copilot init
 ```
 
-If you are already using `mypy` for your project and already have a `mypy.ini` file that you would like to overwrite, simply add the `--overwrite` option:
+Currently, `typing_copilot` is unable to support `mypy.ini` files that it did not generate. If you are already using `mypy` but you'd like to transition to using `typing_copilot` to manage your `mypy.ini` file, you can make use of the `--overwrite` flag:
 ```bash
 typing_copilot init --overwrite
 ```
 
-`typing_copilot` will first run `mypy` using a minimal set of `mypy` checks which are always enabled and cannot be turned off. You'll need to fix any errors `mypy` finds using these checks before moving to the next step.
+After creating your initial `mypy.ini` file with `typing_copilot`, you can also use `typing_copilot` to attempt to tighten your `mypy.ini` configuration. This is useful, for example, if you've recently added type hints to your code and believe that should enable a tighter new `mypy.ini` configuration. Simply run the following to update your `mypy.ini` to the tightest passing `mypy` configuration:
+```bash
+typing_copilot tighten
+```
 
-Once the minimal `mypy` checks pass, `typing_copilot init` will automatically re-run `mypy` with the strictest supported set of checks, and collect the reported errors. After analyzing the errors, it will generate the strictest set of checks that will not cause errors, validate them by running `mypy` against your project one more time, and then create a new `mypy.ini` file with this new "strictest valid" configuration.
+In a CI environment, `typing_copilot` can simultaneously ensure both that your code passes `mypy` checks with the current `mypy.ini` configuration, and that the current `mypy.ini` file is the tightest `mypy` config that your code is able to support. Simply use the `--error-if-can-tighten` flag in the `tighten` command:
+```bash
+typing_copilot tighten --error-if-can-tighten
+```
+
+## How `typing_copilot` works
+
+### `typing_copilot init`
+
+With this command, `typing_copilot` will first run `mypy` using a minimal set of `mypy` checks which are always enabled and cannot be turned off. You'll need to fix any errors `mypy` finds using these checks before the command will be able to proceed.
+
+Once the minimal `mypy` checks pass, `typing_copilot init` will automatically re-run `mypy` with the strictest supported set of checks, and collect the reported errors. After analyzing the errors, it will generate the strictest set of checks that will not cause errors, validate them by running `mypy` against your project one more time, and then create a new `mypy.ini` file with this new "strictest valid" configuration. We generally refer to this "strictest valid" configuration as the project's "tightest" configuration, hence the `tighten` command described below.
+
+### `typing_copilot tighten`
+
+With this command, `typing_copilot` will first run `mypy` using your current `mypy.ini` file, ensuring that the current configuration does not produce any `mypy` errors. Assuming no errors are found, `typing_copilot` will then follow the same procedure as in the `init` command to find the tightest `mypy` configuration your project's current state supports. Finally, it will compare this newly-found tightest configuration against your current `mypy.ini` configuration, and either update your `mypy.ini` file or return an error, depending on whether the `--error-if-can-tighten` is set.
 
 ## Reporting issues
 
