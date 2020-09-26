@@ -8,6 +8,24 @@ from typing import List, Type, TypeVar, Optional
 from .verbosity import log_if_verbose
 
 
+def run_mypy_with_config_file(mypy_config_path: str) -> subprocess.CompletedProcess:
+    run_args = [
+        "mypy",
+        "--config-file",
+        mypy_config_path,
+        "--show-error-codes",
+        "--error-summary",
+        ".",
+    ]
+    log_if_verbose(f"Running mypy with {run_args}")
+    completed_process = subprocess.run(run_args, capture_output=True, encoding="utf-8")
+    log_if_verbose(
+        f"Run completed with exit code {completed_process.returncode}. "
+        f"Stdout: ***\n{completed_process.stdout}\n***"
+    )
+    return completed_process
+
+
 def run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
     with TemporaryDirectory(prefix="mypy-copilot-") as temp_dir:
         mypy_config_path = path.join(temp_dir, "mypy.ini")
@@ -17,21 +35,7 @@ def run_mypy_with_config(mypy_config: str) -> subprocess.CompletedProcess:
             mypy_config_file.flush()
             os.fsync(mypy_config_file.fileno())
 
-        run_args = [
-            "mypy",
-            "--config-file",
-            mypy_config_path,
-            "--show-error-codes",
-            "--error-summary",
-            ".",
-        ]
-        log_if_verbose(f"Running mypy with {run_args}")
-        completed_process = subprocess.run(run_args, capture_output=True, encoding="utf-8")
-        log_if_verbose(
-            f"Run completed with exit code {completed_process.returncode}. "
-            f"Stdout: ***\n{completed_process.stdout}\n***"
-        )
-        return completed_process
+        return run_mypy_with_config_file(mypy_config_path)
 
 
 MypyErrorT = TypeVar("MypyErrorT", bound="MypyError")
