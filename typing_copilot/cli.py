@@ -31,9 +31,7 @@ from . import __package_name__, __version__
 
 
 def _make_strictest_mypy_config_components_from_errors(
-    strict_errors: List[MypyError],
-    *,
-    describe_constructed_config: bool = True,
+    strict_errors: List[MypyError], *, describe_constructed_config: bool = True,
 ) -> Tuple[str, str, str, str]:
     final_config_global = STRICT_BASELINE_MYPY_CONFIG
     final_config_unused_ignores = make_unused_ignores_config_line(True)
@@ -95,8 +93,7 @@ def _generate_final_mypy_config_from_components(
 
 
 def _generate_final_mypy_config_with_unused_ignore_suppression(
-    final_config_components: Tuple[str, str, str, str],
-    unused_ignore_errors: List[MypyError],
+    final_config_components: Tuple[str, str, str, str], unused_ignore_errors: List[MypyError],
 ) -> str:
     if not unused_ignore_errors:
         raise AssertionError(
@@ -164,9 +161,7 @@ def _work_around_mypy_strict_optional_bug(completed_process: CompletedProcess) -
             "This is a bug."
         )
     workaround_lax_config = LAX_BASELINE_MYPY_CONFIG.replace(problematic_line, workaround_line)
-    return run_mypy_with_config(
-        workaround_lax_config + make_unused_ignores_config_line(False)
-    )
+    return run_mypy_with_config(workaround_lax_config + make_unused_ignores_config_line(False))
 
 
 @click.group()
@@ -263,14 +258,10 @@ def _are_mypy_configs_equal(mypy_config_a: str, mypy_config_b: str) -> bool:
     lines_in_b = mypy_config_b.strip().split("\n")
 
     nonempty_lines_in_a_minus_comments = [
-        line
-        for line in lines_in_a
-        if line and not line.lstrip().startswith("#")
+        line for line in lines_in_a if line and not line.lstrip().startswith("#")
     ]
     nonempty_lines_in_b_minus_comments = [
-        line
-        for line in lines_in_b
-        if line and not line.lstrip().startswith("#")
+        line for line in lines_in_b if line and not line.lstrip().startswith("#")
     ]
     return nonempty_lines_in_a_minus_comments == nonempty_lines_in_b_minus_comments
 
@@ -278,11 +269,13 @@ def _are_mypy_configs_equal(mypy_config_a: str, mypy_config_b: str) -> bool:
 @cli.command()
 @click.option("--verbose", is_flag=True, default=False, help="Enable verbose logging.")
 @click.option(
-    "--error-if-can-tighten", is_flag=True, default=False,
+    "--error-if-can-tighten",
+    is_flag=True,
+    default=False,
     help=(
         "Exit 1 if a tighter configuration is available and print it to stdout, "
         "instead of overwriting the mypy.ini file. Intended for use in CI environments."
-    )
+    ),
 )
 def tighten(verbose: bool, error_if_can_tighten: bool) -> None:
     """Attempt to tighten your project's existing mypy.ini file."""

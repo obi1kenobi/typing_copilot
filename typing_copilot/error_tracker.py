@@ -1,5 +1,4 @@
 import importlib
-import inspect
 import os
 import pkgutil
 import re
@@ -42,12 +41,8 @@ _code_and_message_to_error_setting: Dict[str, Dict[str, MypyErrorSetting]] = {
         "error: Function is missing a type annotation": ("disallow_untyped_defs", False),
         "": ("disallow_incomplete_defs", False),
     },
-    "no-untyped-call": {
-        "": ("disallow_untyped_calls", False),
-    },
-    "": {
-        "error: unused 'type: ignore' comment": _warn_unused_ignores_error_setting,
-    },
+    "no-untyped-call": {"": ("disallow_untyped_calls", False),},
+    "": {"error: unused 'type: ignore' comment": _warn_unused_ignores_error_setting,},
 }
 _settings_that_require_other_settings: Dict[MypyErrorSetting, FrozenSet[MypyErrorSetting]] = {
     ("disallow_incomplete_defs", False): frozenset({("disallow_untyped_defs", False)})
@@ -100,7 +95,8 @@ def _get_error_setting_for_error(error: MypyError) -> MypyErrorSetting:
 
 
 def _get_module_for_error(error: MypyError) -> str:
-    # TODO: fix inspected_module_name being just the local module name and not the fully-qualified one
+    # TODO: fix inspected_module_name being just the local module name
+    #       and not the fully-qualified one
     # inspected_module_name = inspect.getmodulename(error.file_path)
     # if inspected_module_name is not None:
     #     validate_module_name(inspected_module_name)
