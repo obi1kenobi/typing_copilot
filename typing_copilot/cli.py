@@ -155,6 +155,11 @@ def _work_around_mypy_strict_optional_bug(
     if "INTERNAL ERROR" not in completed_process.stderr:
         return completed_process, full_lax_config
 
+    click.echo("Ran into a known issue with mypy.")
+    click.echo("If this GitHub issue is resolved, try upgrading your mypy version:")
+    click.echo("  https://github.com/python/mypy/issues/9437")
+    click.echo("For now, going to attempt a workaround, please wait...\n")
+
     problematic_line = "strict_optional = False\n"
     workaround_line = "strict_optional = True\n"
     if problematic_line not in LAX_BASELINE_MYPY_CONFIG:
