@@ -146,7 +146,6 @@ def _work_around_mypy_strict_optional_bug(completed_process: CompletedProcess) -
     # Workaround for failed lax mypy run due to:
     # https://github.com/obi1kenobi/typing-copilot/issues/1
     # https://github.com/python/mypy/issues/9437
-    print(completed_process)
     if completed_process.returncode != 2:  # mypy exits 2 when it crashes
         return completed_process
 
