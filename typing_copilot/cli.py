@@ -142,15 +142,18 @@ def _get_unused_ignore_errors_from_validation_run(mypy_config: str) -> List[Mypy
     return unused_ignore_errors
 
 
-def _work_around_mypy_strict_optional_bug(completed_process: CompletedProcess) -> CompletedProcess:
+def _work_around_mypy_strict_optional_bug(
+    completed_process: CompletedProcess,
+    full_lax_config: str,
+) -> Tuple[CompletedProcess, str]:
     # Workaround for failed lax mypy run due to:
     # https://github.com/obi1kenobi/typing-copilot/issues/1
     # https://github.com/python/mypy/issues/9437
     if completed_process.returncode != 2:  # mypy exits 2 when it crashes
-        return completed_process
+        return completed_process, full_lax_config
 
     if "INTERNAL ERROR" not in completed_process.stderr:
-        return completed_process
+        return completed_process, full_lax_config
 
     problematic_line = "strict_optional = False\n"
     workaround_line = "strict_optional = True\n"
@@ -160,7 +163,9 @@ def _work_around_mypy_strict_optional_bug(completed_process: CompletedProcess) -
             "This is a bug."
         )
     workaround_lax_config = LAX_BASELINE_MYPY_CONFIG.replace(problematic_line, workaround_line)
-    return run_mypy_with_config(workaround_lax_config + make_unused_ignores_config_line(False))
+    full_lax_config = workaround_lax_config + make_unused_ignores_config_line(False)
+    completed_process = run_mypy_with_config(full_lax_config)
+    return completed_process, full_lax_config
 
 
 @click.group()
@@ -199,14 +204,15 @@ def init(verbose: bool, overwrite: bool) -> None:
 
     click.echo("Running mypy once with laxest settings to establish a baseline. Please wait...\n")
 
-    completed_process = run_mypy_with_config(
-        LAX_BASELINE_MYPY_CONFIG + make_unused_ignores_config_line(False)
+    full_lax_config = LAX_BASELINE_MYPY_CONFIG + make_unused_ignores_config_line(False)
+    completed_process = run_mypy_with_config(full_lax_config)
+    completed_process, full_lax_config = _work_around_mypy_strict_optional_bug(
+        completed_process, full_lax_config
     )
-    completed_process = _work_around_mypy_strict_optional_bug(completed_process)
     errors = get_mypy_errors_from_completed_process(completed_process)
     if errors:
         click.echo("Mypy found errors during our baseline run. Executed mypy with config:\n")
-        click.echo(LAX_BASELINE_MYPY_CONFIG)
+        click.echo(full_lax_config)
         click.echo("Mypy output:\n")
         click.echo(completed_process.stdout)
         click.echo(
