@@ -367,8 +367,9 @@ def tighten(verbose: bool, error_if_can_tighten: bool) -> None:
         click.echo(final_config)
         sys.exit(1)
 
+    config_file_length = len(final_config.split("\n"))
     click.echo(
-        f"Found a tighter mypy configuration ({len(final_config.split("\n"))} lines), "
+        f"Found a tighter mypy configuration ({config_file_length} lines), "
         f"updating your mypy.ini file."
     )
     with open("mypy.ini", "w") as f:
