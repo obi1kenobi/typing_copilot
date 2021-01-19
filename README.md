@@ -54,7 +54,7 @@ In the future, we hope to add additional functionality to `typing_copilot`:
 ## Usage
 
 1. Navigate to the root directory of the project on which you'd like to use `typing_copilot`.
-2. Enter the project's virtualenv, if using one, and ensure the project's dependencies are installed.
+2. Enter the project's virtualenv, if using one, and ensure the project's own package and its dependencies are installed.
 3. Run `typing_copilot`:
 ```bash
 pip install typing_copilot
