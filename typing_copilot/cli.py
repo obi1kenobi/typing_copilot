@@ -135,7 +135,7 @@ def _get_unused_ignore_errors_from_validation_run(mypy_config: str) -> List[Mypy
 
         raise AssertionError(
             f"Validation failed: mypy reported {len(other_errors)} unexpected error(s). "
-            f"Please submit the produced logs so we can update typing-copilot to fix this issue."
+            f"Please submit the produced logs so we can update typing-copilot to fix this issue. "
             f"Apologies for the inconvenience, and thank you for supporting typing-copilot."
         )
 
