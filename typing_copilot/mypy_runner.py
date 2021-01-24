@@ -83,7 +83,11 @@ def get_mypy_errors_from_completed_process(
         return []
     elif completed_process.returncode == 1:
         if not (output_lines[-1].startswith("Found ") and " error" in output_lines[-1]):
-            raise AssertionError(f"Unexpected output for mypy exit code 1: {output_lines}")
+            stderr_lines = completed_process.stderr.strip().split("\n")
+            raise AssertionError(
+                f"Unexpected output for mypy exit code 1. Mypy stdout: {output_lines}, "
+                f"stderr: {stderr_lines}"
+            )
 
         error_lines = output_lines[:-1]
         return [
