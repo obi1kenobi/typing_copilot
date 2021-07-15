@@ -41,8 +41,12 @@ _code_and_message_to_error_setting: Dict[str, Dict[str, MypyErrorSetting]] = {
         "error: Function is missing a type annotation": ("disallow_untyped_defs", False),
         "": ("disallow_incomplete_defs", False),
     },
-    "no-untyped-call": {"": ("disallow_untyped_calls", False),},
-    "": {"error: unused 'type: ignore' comment": _warn_unused_ignores_error_setting,},
+    "no-untyped-call": {
+        "": ("disallow_untyped_calls", False),
+    },
+    "": {
+        "error: unused 'type: ignore' comment": _warn_unused_ignores_error_setting,
+    },
 }
 _settings_that_require_other_settings: Dict[MypyErrorSetting, FrozenSet[MypyErrorSetting]] = {
     ("disallow_incomplete_defs", False): frozenset({("disallow_untyped_defs", False)})

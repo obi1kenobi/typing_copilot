@@ -31,7 +31,9 @@ from . import __package_name__, __version__
 
 
 def _make_strictest_mypy_config_components_from_errors(
-    strict_errors: List[MypyError], *, describe_constructed_config: bool = True,
+    strict_errors: List[MypyError],
+    *,
+    describe_constructed_config: bool = True,
 ) -> Tuple[str, str, str, str]:
     final_config_global = STRICT_BASELINE_MYPY_CONFIG
     final_config_unused_ignores = make_unused_ignores_config_line(True)
@@ -93,7 +95,8 @@ def _generate_final_mypy_config_from_components(
 
 
 def _generate_final_mypy_config_with_unused_ignore_suppression(
-    final_config_components: Tuple[str, str, str, str], unused_ignore_errors: List[MypyError],
+    final_config_components: Tuple[str, str, str, str],
+    unused_ignore_errors: List[MypyError],
 ) -> str:
     if not unused_ignore_errors:
         raise AssertionError(
