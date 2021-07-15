@@ -139,7 +139,8 @@ def _get_child_module_names_for_module(module_name: str) -> Set[str]:
     module = importlib.import_module(module_name)
 
     result: Set[str] = set()
-    for module_info in pkgutil.walk_packages(module.__path__, module_name + "."):
+    module_path = module.__path__  # type: ignore  # mypy doesn't seem to be able to find this attr
+    for module_info in pkgutil.walk_packages(module_path, module_name + "."):
         result.add(module_info.name)
 
     return result
