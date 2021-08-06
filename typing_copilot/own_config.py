@@ -9,7 +9,7 @@ from typing import Any, Mapping, Optional, Type, TypeVar
 ConfigT = TypeVar("ConfigT", bound="TypingCopilotConfig")
 
 
-def _find_pyproject_toml(search_path: Path) -> Optional[Path]:
+def find_pyproject_toml(search_path: Path) -> Optional[Path]:
     resolved_path = search_path.resolve()
 
     for current_path in chain((resolved_path,), resolved_path.parents):
@@ -39,7 +39,7 @@ class TypingCopilotConfig:
 
 
 def fetch_config_from_pyproject_toml(search_path: Path) -> Optional[TypingCopilotConfig]:
-    pyproject_toml_path = _find_pyproject_toml(search_path)
+    pyproject_toml_path = find_pyproject_toml(search_path)
 
     if pyproject_toml_path is not None:
         try:
