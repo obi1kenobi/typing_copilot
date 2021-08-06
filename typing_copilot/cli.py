@@ -1,4 +1,5 @@
 from os import path
+from pathlib import Path
 import pprint
 from subprocess import CompletedProcess
 import sys
@@ -26,6 +27,7 @@ from .mypy_runner import (
     run_mypy_with_config,
     run_mypy_with_config_file,
 )
+from .own_config import TypingCopilotConfig, fetch_config_from_pyproject_toml
 from .verbosity import enable_verbose_mode, log_if_verbose
 from . import __package_name__, __version__
 
@@ -176,6 +178,16 @@ def _work_around_mypy_strict_optional_bug(
     return completed_process, full_lax_config
 
 
+def _get_own_config() -> TypingCopilotConfig:
+    search_path = Path.cwd().resolve()
+    pyproject_toml_config = fetch_config_from_pyproject_toml(search_path)
+
+    if pyproject_toml_config is not None:
+        return pyproject_toml_config
+
+    return TypingCopilotConfig.empty()
+
+
 @click.group()
 @click.option("--verbose", is_flag=True, help="Enable verbose logging.")
 @click.option("--version", is_flag=True, default=False)  # just to avoid erroring on --version arg
@@ -209,6 +221,8 @@ def init(verbose: bool, overwrite: bool) -> None:
                 "not set. Please either move or rename the file, or use the '--overwrite' command."
             )
             sys.exit(1)
+
+    own_config = _get_own_config()
 
     click.echo("Running mypy once with laxest settings to establish a baseline. Please wait...\n")
 
@@ -317,6 +331,8 @@ def tighten(verbose: bool, error_if_can_tighten: bool) -> None:
     except FileNotFoundError:
         click.echo("Cannot tighten mypy config: no mypy.ini was found in the current directory.")
         sys.exit(1)
+
+    own_config = _get_own_config()
 
     # By this point, we know a mypy.ini file exists and is a product of this program.
     # Next, ensure that mypy passes with no errors with the current mypy.ini config.
