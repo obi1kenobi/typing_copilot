@@ -226,8 +226,9 @@ def init(verbose: bool, overwrite: bool) -> None:
 
     click.echo("Running mypy once with laxest settings to establish a baseline. Please wait...\n")
 
-    full_lax_config = (
-        make_lax_baseline_mypy_config(own_config) + make_unused_ignores_config_line(False))
+    full_lax_config = make_lax_baseline_mypy_config(own_config) + make_unused_ignores_config_line(
+        False
+    )
     completed_process = run_mypy_with_config(full_lax_config)
     completed_process, full_lax_config = _work_around_mypy_strict_optional_bug(
         completed_process, full_lax_config
@@ -261,7 +262,8 @@ def init(verbose: bool, overwrite: bool) -> None:
     )
 
     final_config_components = _make_strictest_mypy_config_components_from_errors(
-        own_config, strict_errors)
+        own_config, strict_errors
+    )
     final_config = _generate_final_mypy_config_from_components(*final_config_components)
 
     config_file_length = len(final_config.split("\n"))

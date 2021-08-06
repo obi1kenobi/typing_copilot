@@ -31,11 +31,16 @@ class TypingCopilotConfig:
 
     @classmethod
     def from_toml(cls: Type[ConfigT], toml_content: Mapping[str, Any]) -> ConfigT:
-        pass
+        own_config_prefix = "tool-typing_copilot"
+        mypy_global_config: Mapping[str, Any] = toml_content.get(
+            f"{own_config_prefix}.mypy_global_config", {}
+        )
+
+        return cls(mypy_global_config=mypy_global_config)
 
     @classmethod
     def empty(cls: Type[ConfigT]) -> ConfigT:
-        return cls(dict())
+        return cls(mypy_global_config=dict())
 
 
 def fetch_config_from_pyproject_toml(search_path: Path) -> Optional[TypingCopilotConfig]:

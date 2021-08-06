@@ -15,10 +15,7 @@ def _make_mypy_config(mypy_global_config_values: Dict[str, Any]) -> str:
 [mypy]"""
 
     config_lines = [header]
-    config_lines.extend(
-        f"{key} = {value}"
-        for key, value in mypy_global_config_values.items()
-    )
+    config_lines.extend(f"{key} = {value}" for key, value in mypy_global_config_values.items())
 
     return "\n".join(config_lines) + "\n"
 
