@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
 jupyterlab = "^3.0.16"
