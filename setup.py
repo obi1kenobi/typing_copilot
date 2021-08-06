@@ -58,6 +58,7 @@ setup(
         "click>=8,<9",
         "mypy>=0.782",
         "toml>=0.10.2,<1",
+        "types-toml>=0.1.3",
     ],
     python_requires=">=3.7",
 )
