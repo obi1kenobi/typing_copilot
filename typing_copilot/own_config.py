@@ -5,20 +5,8 @@ from itertools import chain
 from pathlib import Path
 from typing import Any, Mapping, Optional, Type, TypeVar
 
+
 ConfigT = TypeVar("ConfigT", bound="TypingCopilotConfig")
-
-
-@dataclass(frozen=True)
-class TypingCopilotConfig:
-    mypy_global_config: Mapping[str, Any]
-
-    @classmethod
-    def from_toml(cls: Type[ConfigT], toml_content: Mapping[str, Any]) -> ConfigT:
-        pass
-
-    @classmethod
-    def empty(cls: Type[ConfigT]) -> ConfigT:
-        return cls(dict())
 
 
 def _find_pyproject_toml(search_path: Path) -> Optional[Path]:
@@ -35,6 +23,19 @@ def _find_pyproject_toml(search_path: Path) -> Optional[Path]:
 
     # Reached the root of the filesystem and didn't find a pyproject.toml.
     return None
+
+
+@dataclass(frozen=True)
+class TypingCopilotConfig:
+    mypy_global_config: Mapping[str, Any]
+
+    @classmethod
+    def from_toml(cls: Type[ConfigT], toml_content: Mapping[str, Any]) -> ConfigT:
+        pass
+
+    @classmethod
+    def empty(cls: Type[ConfigT]) -> ConfigT:
+        return cls(dict())
 
 
 def fetch_config_from_pyproject_toml(search_path: Path) -> Optional[TypingCopilotConfig]:
