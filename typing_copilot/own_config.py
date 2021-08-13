@@ -32,9 +32,9 @@ class TypingCopilotConfig:
     @classmethod
     def from_toml(cls: Type[ConfigT], toml_content: Mapping[str, Any]) -> ConfigT:
         own_config_prefix = "tool-typing_copilot"
-        mypy_global_config: Mapping[str, Any] = toml_content.get(
-            f"{own_config_prefix}.mypy_global_config", {}
-        )
+        typing_copilot_config: Mapping[str, Any] = toml_content.get(own_config_prefix, {})
+
+        mypy_global_config: Mapping[str, Any] = typing_copilot_config.get("mypy_global_config", {})
 
         return cls(mypy_global_config=mypy_global_config)
 
@@ -45,7 +45,6 @@ class TypingCopilotConfig:
 
 def fetch_config_from_pyproject_toml(search_path: Path) -> Optional[TypingCopilotConfig]:
     pyproject_toml_path = find_pyproject_toml(search_path)
-
     if pyproject_toml_path is not None:
         try:
             with open(pyproject_toml_path) as f:

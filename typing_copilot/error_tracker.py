@@ -11,11 +11,12 @@ from .validation import validate_module_name
 
 
 _module_missing_type_hint_pattern = re.compile(
-    r"error: Skipping analyzing '([a-zA-Z0-9_\.]+)': "
+    r"error: Skipping analyzing [\"']([a-zA-Z0-9_\.]+)[\"']: "
     r"found module but no type hints or library stubs"
 )
 _module_missing_implementation_or_library_stub_pattern = re.compile(
-    r"error: Cannot find implementation or library stub for module named '([a-zA-Z0-9_\.]+)'"
+    r"error: Cannot find implementation or library stub "
+    r"for module named [\"']([a-zA-Z0-9_\.]+)[\"']"
 )
 
 MypyErrorSetting = Tuple[str, bool]
