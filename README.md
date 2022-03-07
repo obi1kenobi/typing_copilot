@@ -77,6 +77,18 @@ In a CI environment, `typing_copilot` can simultaneously ensure both that your c
 typing_copilot tighten --error-if-can-tighten
 ```
 
+### Setting custom top-level mypy flags
+
+Occasionally, it's useful to specify custom top-level `mypy` flags, such as a list of plugins `mypy` should use when type-checking your code. To ensure `typing_copilot` sets those top-level `mypy` flags in its generated `mypy.ini` files, add a section like the following example to your project's `pyproject.toml`:
+```toml
+[tool-typing_copilot.mypy_global_config]
+warn_unused_ignores = true
+plugins = ["mypy_django_plugin.main"]
+```
+Now, when `typing_copilot` runs, its generated `mypy.ini` will *always* contain `warn_unused_ignores = true` and specify the Django `mypy` plugin.
+
+If you need to pass additional configuration to the plugin (e.g. set `django_settings_module` for the Django `mypy` plugin), please configure it separately from the `mypy.ini` file. For the Django `mypy` plugin, for example, prefer configuring it using its own `[tool.django-stubs]` section in `pyproject.toml` as [suggested in its docs](https://github.com/typeddjango/django-stubs#installation).
+
 ## How `typing_copilot` works
 
 ### `typing_copilot init`
