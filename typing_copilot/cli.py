@@ -199,7 +199,7 @@ def _fetch_config_from_pyproject_toml(search_path: Path) -> Optional[TypingCopil
             click.secho(
                 f"Failed to open pyproject.toml file at path {pyproject_toml_path} "
                 f"due to error {e}.",
-                fg='red'
+                fg="red",
             )
             sys.exit(1)
         except toml.TomlDecodeError:
