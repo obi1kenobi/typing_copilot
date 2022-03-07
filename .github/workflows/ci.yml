@@ -1,0 +1,48 @@
+name: Tests and lint
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - "*"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+      - name: Cache the Python dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: Set up poetry
+        uses: Gr1N/setup-poetry@v7
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip setuptools
+          poetry install
+      - name: Run lint checks
+        run: |
+          poetry run flake8 --config ./setup.cfg .
+          poetry run black --check .
+          poetry run mypy .
+      - name: Test with pytest
+        run: |
+          poetry run pytest

@@ -56,7 +56,9 @@ setup(
     entry_points={"console_scripts": ["typing_copilot=typing_copilot.cli:cli"]},
     install_requires=[  # Make sure to keep in sync with poetry requirements.
         "click>=8,<9",
-        "mypy>=0.782,<0.800",
+        "mypy>=0.782",
+        "toml>=0.10.2,<1",
+        "types-toml>=0.10.4,<1",
     ],
     python_requires=">=3.7",
 )
