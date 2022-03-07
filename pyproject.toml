@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "typing_copilot"
-version = "0.6.0"
+version = "0.7.0"
 description = "Helper for starting to type-hint large codebases with mypy."
 authors = ["Predrag Gruevski <obi1kenobi82@gmail.com>"]
 license = "MIT"
