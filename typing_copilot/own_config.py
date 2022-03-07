@@ -41,17 +41,3 @@ class TypingCopilotConfig:
     @classmethod
     def empty(cls: Type[ConfigT]) -> ConfigT:
         return cls(mypy_global_config=dict())
-
-
-def fetch_config_from_pyproject_toml(search_path: Path) -> Optional[TypingCopilotConfig]:
-    pyproject_toml_path = find_pyproject_toml(search_path)
-    if pyproject_toml_path is not None:
-        try:
-            with open(pyproject_toml_path) as f:
-                return TypingCopilotConfig.from_toml(toml.load(f))
-        except OSError:
-            return None
-        except toml.TomlDecodeError:
-            return None
-
-    return None
